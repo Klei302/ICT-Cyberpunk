@@ -392,6 +392,26 @@ export default function App() {
     <div className={`min-h-screen transition-colors duration-500 font-sans selection:bg-red-200 ${
       isDarkMode ? 'bg-[#0A0A0A] text-white' : 'bg-[#FDFCFB] text-[#1A1A1A]'
     }`}>
+      {/* Error Banner */}
+      <AnimatePresence>
+        {error && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="fixed top-20 left-0 w-full z-[60] bg-red-600 text-white py-3 px-6 text-center text-sm font-bold shadow-lg"
+          >
+            <div className="max-w-7xl mx-auto flex items-center justify-center gap-3">
+              <Info className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+              <button onClick={() => setError(null)} className="ml-4 p-1 hover:bg-black/20 rounded">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${
         scrolled || view === 'details' 
