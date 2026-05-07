@@ -71,7 +71,8 @@ interface CityData {
 const getAI = () => {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error("GEMINI_API_KEY is not defined. Please add it to your environment variables.");
+    // We return null instead of throwing an error immediately to avoid white-screen crashes
+    return null;
   }
   return new GoogleGenAI({ apiKey });
 };
@@ -195,6 +196,11 @@ function ChatBot() {
 
     try {
       const ai = getAI();
+      if (!ai) {
+        setMessages(prev => [...prev, { role: 'bot', text: "I can't talk right now because the GEMINI_API_KEY is missing! If you are the owner, please check your GitHub Secrets." }]);
+        setIsTyping(false);
+        return;
+      }
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: userMessage,
@@ -323,6 +329,11 @@ export default function App() {
 
     try {
       const ai = getAI();
+      if (!ai) {
+        setError("API Key is missing. This app needs a GEMINI_API_KEY in your GitHub Secrets to power the AI. Please add it to your environment variables.");
+        setIsLoading(false);
+        return;
+      }
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `Generate a comprehensive city guide for ${cityName}. 
