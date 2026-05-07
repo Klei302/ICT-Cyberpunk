@@ -330,7 +330,7 @@ export default function App() {
     try {
       const ai = getAI();
       if (!ai) {
-        setError("API Key is missing. This app needs a GEMINI_API_KEY in your GitHub Secrets to power the AI. Please add it to your environment variables.");
+        setError("Warning: The AI Key is missing. If you are the developer, make sure GEMINI_API_KEY is added to your environment variables or GitHub Secrets.");
         setIsLoading(false);
         return;
       }
@@ -357,10 +357,11 @@ export default function App() {
       });
 
       const data = JSON.parse(response.text || '{}');
+      if (!data.name) throw new Error("Invalid data received");
       setCityData(data);
     } catch (err) {
       console.error(err);
-      setError("Dolemi! We encountered an issue exploring Korçë. Please refresh.");
+      setError("Dolemi! We couldn't fetch the city guide. This usually happens if the AI server is busy or the API Key is invalid.");
     } finally {
       setIsLoading(false);
     }
@@ -474,6 +475,25 @@ export default function App() {
             >
               <Loader2 className="w-12 h-12 animate-spin text-red-700" />
               <p className="font-bold tracking-widest uppercase text-xs text-gray-400">Arriving in the Little Paris of Albania...</p>
+            </motion.section>
+          ) : !cityData ? (
+            <motion.section 
+              key="no-data"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="h-screen flex flex-col items-center justify-center space-y-6 px-6 text-center"
+            >
+              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center text-red-700 mb-4">
+                <Info className="w-10 h-10" />
+              </div>
+              <h2 className="text-3xl font-bold">Connection Lost</h2>
+              <p className="text-gray-500 max-w-md">We couldn't wake up the city guide. This usually means the API key is missing or the connection was interrupted.</p>
+              <button 
+                onClick={() => exploreCity("Korçë, Albania")}
+                className="px-8 py-3 bg-red-700 text-white rounded-full font-bold uppercase tracking-widest text-xs hover:bg-black transition-colors"
+              >
+                Try Reconnecting
+              </button>
             </motion.section>
           ) : view === 'home' ? (
             <motion.div 
