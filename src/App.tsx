@@ -68,7 +68,13 @@ interface CityData {
 }
 
 // --- AI Initialization ---
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const getAI = () => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is not defined. Please add it to your environment variables.");
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
 const CITY_SCHEMA = {
   type: Type.OBJECT,
@@ -188,6 +194,7 @@ function ChatBot() {
     setIsTyping(true);
 
     try {
+      const ai = getAI();
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: userMessage,
@@ -315,6 +322,7 @@ export default function App() {
     setError(null);
 
     try {
+      const ai = getAI();
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `Generate a comprehensive city guide for ${cityName}. 
